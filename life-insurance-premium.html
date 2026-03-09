@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Insurance Cost Estimator - Free Insurance Calculator 2026 | HealthCalcs</title>
-    <meta name="description" content="Free health insurance cost calculator. Estimate monthly health insurance premium based on age, family size, income, and plan type. ACA marketplace 2026.">
-    <link rel="canonical" href="https://alexchalu.github.io/healthcalcs/health-insurance-cost.html">
+    <title>Life Insurance Premium Calculator - Free Insurance Calculator 2026 | HealthCalcs</title>
+    <meta name="description" content="Free life insurance premium calculator. Estimate term life insurance cost based on age, coverage amount, term length, and health. Compare rates 2026.">
+    <link rel="canonical" href="https://alexchalu.github.io/healthcalcs/life-insurance-premium.html">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
@@ -45,8 +45,8 @@
 <body>
     <div class="header">
         <div class="container">
-            <h1>Health Insurance Cost Estimator</h1>
-            <p>Estimate your health insurance premium</p>
+            <h1>Life Insurance Premium Calculator</h1>
+            <p>Estimate your life insurance cost</p>
         </div>
     </div>
 
@@ -65,19 +65,21 @@
         </div>
 
         <div class="input-group">
-          <label for="familySize">Family Size</label>
-          <input type="number" id="familySize" placeholder="1">
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="Male">Male</option><option value="Female">Female</option>
+          </select>
         </div>
 
         <div class="input-group">
-          <label for="income">Annual Income ($)</label>
-          <input type="number" id="income" placeholder="50000">
+          <label for="coverageAmount">Coverage Amount ($)</label>
+          <input type="number" id="coverageAmount" placeholder="500000">
         </div>
 
         <div class="input-group">
-          <label for="planType">Plan Type</label>
-          <select id="planType">
-            <option value="Bronze">Bronze</option><option value="Silver">Silver</option><option value="Gold">Gold</option><option value="Platinum">Platinum</option>
+          <label for="termLength">Term Length (years)</label>
+          <select id="termLength">
+            <option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option>
           </select>
         </div>
 
@@ -119,128 +121,90 @@
         function calculate() {
             
       const age = parseFloat(document.getElementById('age').value) || 0;
-      const familySize = parseFloat(document.getElementById('familySize').value) || 1;
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      const planType = document.getElementById('planType').value;
+      const gender = document.getElementById('gender').value;
+      const coverageAmount = parseFloat(document.getElementById('coverageAmount').value) || 0;
+      const termLength = parseFloat(document.getElementById('termLength').value) || 20;
       const smoker = document.getElementById('smoker').value === 'Yes';
       
-      if (age === 0) {
-        return { error: 'Please enter your age' };
+      if (age === 0 || coverageAmount === 0) {
+        return { error: 'Please enter your age and coverage amount' };
       }
       
-      // Base premium for 21yo
-      let basePremium = 350;
+      // Base rate per $1000 of coverage
+      let baseRate = 0.10; // $0.10 per $1000 for healthy 30yo
       
       // Age adjustment
-      if (age < 30) basePremium *= 1.0;
-      else if (age < 40) basePremium *= 1.3;
-      else if (age < 50) basePremium *= 1.8;
-      else if (age < 60) basePremium *= 2.5;
-      else basePremium *= 3.0;
+      if (age < 30) baseRate *= 0.8;
+      else if (age < 40) baseRate *= 1.0;
+      else if (age < 50) baseRate *= 1.8;
+      else if (age < 60) baseRate *= 3.5;
+      else baseRate *= 6.0;
       
-      // Plan type adjustment
-      if (planType === 'Bronze') basePremium *= 0.85;
-      else if (planType === 'Silver') basePremium *= 1.0;
-      else if (planType === 'Gold') basePremium *= 1.25;
-      else if (planType === 'Platinum') basePremium *= 1.5;
+      // Gender adjustment (women live longer)
+      if (gender === 'Female') baseRate *= 0.85;
       
-      // Family size (additional members cost ~40% each)
-      basePremium *= (1 + (familySize - 1) * 0.4);
+      // Term length adjustment
+      if (termLength >= 30) baseRate *= 1.15;
+      else if (termLength >= 20) baseRate *= 1.05;
       
-      // Smoker surcharge
-      if (smoker) basePremium *= 1.5;
+      // Smoker adjustment (huge impact)
+      if (smoker) baseRate *= 2.5;
       
-      // ACA subsidy calculation
-      const fpl = 15060 + (5380 * (familySize - 1)); // 2026 FPL estimate
-      const fplPercent = (income / fpl * 100).toFixed(0);
-      let subsidy = 0;
-      let subsidyPercent = 0;
-      
-      if (income > 0 && income < fpl * 4) {
-        // Simplified subsidy (actual is more complex)
-        if (fplPercent < 150) subsidyPercent = 85;
-        else if (fplPercent < 200) subsidyPercent = 70;
-        else if (fplPercent < 250) subsidyPercent = 55;
-        else if (fplPercent < 300) subsidyPercent = 35;
-        else if (fplPercent < 400) subsidyPercent = 20;
-        
-        subsidy = basePremium * (subsidyPercent / 100);
-      }
-      
-      const afterSubsidy = basePremium - subsidy;
-      const annualCost = afterSubsidy * 12;
+      const monthlyPremium = (coverageAmount / 1000) * baseRate;
+      const annualPremium = monthlyPremium * 12;
+      const totalCost = annualPremium * termLength;
       
       return {
-        monthlyPremium: basePremium.toFixed(2),
-        subsidy: subsidy.toFixed(2),
-        afterSubsidy: afterSubsidy.toFixed(2),
-        annualCost: annualCost.toFixed(2),
-        fplPercent: fplPercent,
-        planType: planType
+        monthlyPremium: monthlyPremium.toFixed(2),
+        annualPremium: annualPremium.toFixed(2),
+        totalCost: totalCost.toFixed(0),
+        termLength: termLength,
+        coverageAmount: coverageAmount.toLocaleString()
       };
     
             
             const result = (function() {
                 
       const age = parseFloat(document.getElementById('age').value) || 0;
-      const familySize = parseFloat(document.getElementById('familySize').value) || 1;
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      const planType = document.getElementById('planType').value;
+      const gender = document.getElementById('gender').value;
+      const coverageAmount = parseFloat(document.getElementById('coverageAmount').value) || 0;
+      const termLength = parseFloat(document.getElementById('termLength').value) || 20;
       const smoker = document.getElementById('smoker').value === 'Yes';
       
-      if (age === 0) {
-        return { error: 'Please enter your age' };
+      if (age === 0 || coverageAmount === 0) {
+        return { error: 'Please enter your age and coverage amount' };
       }
       
-      // Base premium for 21yo
-      let basePremium = 350;
+      // Base rate per $1000 of coverage
+      let baseRate = 0.10; // $0.10 per $1000 for healthy 30yo
       
       // Age adjustment
-      if (age < 30) basePremium *= 1.0;
-      else if (age < 40) basePremium *= 1.3;
-      else if (age < 50) basePremium *= 1.8;
-      else if (age < 60) basePremium *= 2.5;
-      else basePremium *= 3.0;
+      if (age < 30) baseRate *= 0.8;
+      else if (age < 40) baseRate *= 1.0;
+      else if (age < 50) baseRate *= 1.8;
+      else if (age < 60) baseRate *= 3.5;
+      else baseRate *= 6.0;
       
-      // Plan type adjustment
-      if (planType === 'Bronze') basePremium *= 0.85;
-      else if (planType === 'Silver') basePremium *= 1.0;
-      else if (planType === 'Gold') basePremium *= 1.25;
-      else if (planType === 'Platinum') basePremium *= 1.5;
+      // Gender adjustment (women live longer)
+      if (gender === 'Female') baseRate *= 0.85;
       
-      // Family size (additional members cost ~40% each)
-      basePremium *= (1 + (familySize - 1) * 0.4);
+      // Term length adjustment
+      if (termLength >= 30) baseRate *= 1.15;
+      else if (termLength >= 20) baseRate *= 1.05;
       
-      // Smoker surcharge
-      if (smoker) basePremium *= 1.5;
+      // Smoker adjustment (huge impact)
+      if (smoker) baseRate *= 2.5;
       
-      // ACA subsidy calculation
-      const fpl = 15060 + (5380 * (familySize - 1)); // 2026 FPL estimate
-      const fplPercent = (income / fpl * 100).toFixed(0);
-      let subsidy = 0;
-      let subsidyPercent = 0;
-      
-      if (income > 0 && income < fpl * 4) {
-        // Simplified subsidy (actual is more complex)
-        if (fplPercent < 150) subsidyPercent = 85;
-        else if (fplPercent < 200) subsidyPercent = 70;
-        else if (fplPercent < 250) subsidyPercent = 55;
-        else if (fplPercent < 300) subsidyPercent = 35;
-        else if (fplPercent < 400) subsidyPercent = 20;
-        
-        subsidy = basePremium * (subsidyPercent / 100);
-      }
-      
-      const afterSubsidy = basePremium - subsidy;
-      const annualCost = afterSubsidy * 12;
+      const monthlyPremium = (coverageAmount / 1000) * baseRate;
+      const annualPremium = monthlyPremium * 12;
+      const totalCost = annualPremium * termLength;
       
       return {
-        monthlyPremium: basePremium.toFixed(2),
-        subsidy: subsidy.toFixed(2),
-        afterSubsidy: afterSubsidy.toFixed(2),
-        annualCost: annualCost.toFixed(2),
-        fplPercent: fplPercent,
-        planType: planType
+        monthlyPremium: monthlyPremium.toFixed(2),
+        annualPremium: annualPremium.toFixed(2),
+        totalCost: totalCost.toFixed(0),
+        termLength: termLength,
+        coverageAmount: coverageAmount.toLocaleString()
       };
     
             })();
@@ -252,24 +216,23 @@
             
             document.getElementById('result').innerHTML = `
       <div class="result-card">
-        <h3>💰 Estimated Monthly Premium</h3>
-        <div class="big-number">$${result.monthlyPremium}</div>
-        <p class="sub" style="color: #10b981;">After subsidy: $${result.afterSubsidy}/month</p>
+        <h3>💰 Estimated Premium</h3>
+        <div class="big-number">$${result.monthlyPremium}/month</div>
+        <p class="sub">$${result.annualPremium}/year</p>
       </div>
       <div class="result-details">
-        <div class="detail-row"><span>Plan Type:</span><span>${result.planType}</span></div>
-        <div class="detail-row"><span>Monthly Subsidy:</span><span style="color: #10b981;">-$${result.subsidy}</span></div>
-        <div class="detail-row"><span>Annual Cost:</span><span>$${result.annualCost}</span></div>
-        <div class="detail-row"><span>% of Federal Poverty Level:</span><span>${result.fplPercent}%</span></div>
+        <div class="detail-row"><span>Coverage Amount:</span><span>$${result.coverageAmount}</span></div>
+        <div class="detail-row"><span>Term Length:</span><span>${result.termLength} years</span></div>
+        <div class="detail-row"><span>Total Cost Over Term:</span><span>$${result.totalCost}</span></div>
       </div>
       <div class="info-box">
-        <strong>💡 About ACA Subsidies:</strong>
+        <strong>💡 How Much Coverage Do You Need?</strong>
         <ul>
-          <li>Subsidies available if income is 100-400% of FPL</li>
-          <li>Apply at HealthCare.gov during open enrollment</li>
-          <li>Bronze = lowest premium, highest deductible</li>
-          <li>Platinum = highest premium, lowest out-of-pocket</li>
-          <li>Silver plans qualify for additional cost-sharing reductions</li>
+          <li>Rule of thumb: 10-12x your annual income</li>
+          <li>Cover outstanding debts (mortgage, loans)</li>
+          <li>Add college costs for children ($100k-200k per child)</li>
+          <li>Factor in lost income until retirement</li>
+          <li>Term life is 10-15x cheaper than whole life</li>
         </ul>
       </div>
     `;

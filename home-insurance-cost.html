@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disability Insurance Calculator - Free Insurance Calculator 2026 | HealthCalcs</title>
-    <meta name="description" content="Free disability insurance calculator. Estimate monthly premium for long-term and short-term disability coverage based on income, age, occupation.">
-    <link rel="canonical" href="https://alexchalu.github.io/healthcalcs/disability-insurance.html">
+    <title>Home Insurance Cost Calculator - Free Insurance Calculator 2026 | HealthCalcs</title>
+    <meta name="description" content="Free home insurance cost calculator. Estimate your homeowners insurance premium based on home value, location, deductible, and coverage. Compare rates 2026.">
+    <link rel="canonical" href="https://alexchalu.github.io/healthcalcs/home-insurance-cost.html">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
@@ -45,8 +45,8 @@
 <body>
     <div class="header">
         <div class="container">
-            <h1>Disability Insurance Calculator</h1>
-            <p>Estimate your disability insurance cost</p>
+            <h1>Home Insurance Cost Calculator</h1>
+            <p>Estimate your home insurance premium</p>
         </div>
     </div>
 
@@ -60,34 +60,30 @@
             <h2>Calculate Your Insurance Cost</h2>
             
         <div class="input-group">
-          <label for="income">Annual Income ($)</label>
-          <input type="number" id="income" placeholder="60000">
+          <label for="homeValue">Home Value ($)</label>
+          <input type="number" id="homeValue" placeholder="300000">
         </div>
 
         <div class="input-group">
-          <label for="age">Your Age</label>
-          <input type="number" id="age" placeholder="35">
+          <label for="squareFeet">Square Feet</label>
+          <input type="number" id="squareFeet" placeholder="2000">
         </div>
 
         <div class="input-group">
-          <label for="occupation">Occupation Risk</label>
-          <select id="occupation">
-            <option value="Low (office work)">Low (office work)</option><option value="Medium (light labor)">Medium (light labor)</option><option value="High (construction, trades)">High (construction, trades)</option>
+          <label for="yearBuilt">Year Built</label>
+          <input type="number" id="yearBuilt" placeholder="2000">
+        </div>
+
+        <div class="input-group">
+          <label for="deductible">Deductible ($)</label>
+          <select id="deductible">
+            <option value="500">500</option><option value="1000">1000</option><option value="2500">2500</option><option value="5000">5000</option>
           </select>
         </div>
 
         <div class="input-group">
-          <label for="coveragePercent">Income Coverage %</label>
-          <select id="coveragePercent">
-            <option value="50">50</option><option value="60">60</option><option value="70">70</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="eliminationPeriod">Elimination Period (days)</label>
-          <select id="eliminationPeriod">
-            <option value="30">30</option><option value="60">60</option><option value="90">90</option><option value="180">180</option>
-          </select>
+          <label for="coverageAmount">Coverage Amount ($)</label>
+          <input type="number" id="coverageAmount" placeholder="300000">
         </div>
             <button class="btn" onclick="calculate()">Calculate</button>
             <div id="result"></div>
@@ -120,101 +116,69 @@
     <script>
         function calculate() {
             
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      const age = parseFloat(document.getElementById('age').value) || 0;
-      const occupation = document.getElementById('occupation').value;
-      const coveragePercent = parseFloat(document.getElementById('coveragePercent').value) || 60;
-      const eliminationPeriod = parseFloat(document.getElementById('eliminationPeriod').value) || 90;
+      const homeValue = parseFloat(document.getElementById('homeValue').value) || 0;
+      const squareFeet = parseFloat(document.getElementById('squareFeet').value) || 0;
+      const yearBuilt = parseFloat(document.getElementById('yearBuilt').value) || 2000;
+      const deductible = parseFloat(document.getElementById('deductible').value) || 1000;
+      const coverageAmount = parseFloat(document.getElementById('coverageAmount').value) || homeValue;
       
-      if (income === 0 || age === 0) {
-        return { error: 'Please enter your income and age' };
+      if (homeValue === 0) {
+        return { error: 'Please enter your home value' };
       }
       
-      const monthlyIncome = income / 12;
-      const monthlyBenefit = monthlyIncome * (coveragePercent / 100);
-      
-      // Base rate: 1-3% of monthly benefit
-      let baseRate = 0.02;
+      // Base rate: ~$3.50 per $1000 of coverage (national average)
+      let annualPremium = (coverageAmount / 1000) * 3.50;
       
       // Age adjustment
-      if (age < 30) baseRate *= 0.9;
-      else if (age < 40) baseRate *= 1.0;
-      else if (age < 50) baseRate *= 1.3;
-      else if (age < 60) baseRate *= 1.7;
-      else baseRate *= 2.2;
+      const age = 2026 - yearBuilt;
+      if (age > 30) annualPremium *= 1.2;
+      else if (age > 20) annualPremium *= 1.1;
       
-      // Occupation risk
-      if (occupation.includes('Low')) baseRate *= 1.0;
-      else if (occupation.includes('Medium')) baseRate *= 1.4;
-      else if (occupation.includes('High')) baseRate *= 2.0;
+      // Deductible adjustment
+      if (deductible === 500) annualPremium *= 1.15;
+      else if (deductible === 5000) annualPremium *= 0.85;
       
-      // Elimination period (longer wait = lower premium)
-      if (eliminationPeriod === 30) baseRate *= 1.3;
-      else if (eliminationPeriod === 60) baseRate *= 1.15;
-      else if (eliminationPeriod === 90) baseRate *= 1.0;
-      else if (eliminationPeriod === 180) baseRate *= 0.8;
-      
-      const monthlyPremium = monthlyBenefit * baseRate;
-      const annualPremium = monthlyPremium * 12;
-      const benefitVsPremium = ((monthlyBenefit / monthlyPremium) - 1).toFixed(1);
+      const monthlyPremium = annualPremium / 12;
       
       return {
-        monthlyPremium: monthlyPremium.toFixed(2),
         annualPremium: annualPremium.toFixed(2),
-        monthlyBenefit: monthlyBenefit.toFixed(2),
-        coveragePercent: coveragePercent,
-        eliminationPeriod: eliminationPeriod,
-        benefitVsPremium: benefitVsPremium
+        monthlyPremium: monthlyPremium.toFixed(2),
+        coveragePerDollar: (annualPremium / coverageAmount * 100).toFixed(3),
+        deductible: deductible
       };
     
             
             const result = (function() {
                 
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      const age = parseFloat(document.getElementById('age').value) || 0;
-      const occupation = document.getElementById('occupation').value;
-      const coveragePercent = parseFloat(document.getElementById('coveragePercent').value) || 60;
-      const eliminationPeriod = parseFloat(document.getElementById('eliminationPeriod').value) || 90;
+      const homeValue = parseFloat(document.getElementById('homeValue').value) || 0;
+      const squareFeet = parseFloat(document.getElementById('squareFeet').value) || 0;
+      const yearBuilt = parseFloat(document.getElementById('yearBuilt').value) || 2000;
+      const deductible = parseFloat(document.getElementById('deductible').value) || 1000;
+      const coverageAmount = parseFloat(document.getElementById('coverageAmount').value) || homeValue;
       
-      if (income === 0 || age === 0) {
-        return { error: 'Please enter your income and age' };
+      if (homeValue === 0) {
+        return { error: 'Please enter your home value' };
       }
       
-      const monthlyIncome = income / 12;
-      const monthlyBenefit = monthlyIncome * (coveragePercent / 100);
-      
-      // Base rate: 1-3% of monthly benefit
-      let baseRate = 0.02;
+      // Base rate: ~$3.50 per $1000 of coverage (national average)
+      let annualPremium = (coverageAmount / 1000) * 3.50;
       
       // Age adjustment
-      if (age < 30) baseRate *= 0.9;
-      else if (age < 40) baseRate *= 1.0;
-      else if (age < 50) baseRate *= 1.3;
-      else if (age < 60) baseRate *= 1.7;
-      else baseRate *= 2.2;
+      const age = 2026 - yearBuilt;
+      if (age > 30) annualPremium *= 1.2;
+      else if (age > 20) annualPremium *= 1.1;
       
-      // Occupation risk
-      if (occupation.includes('Low')) baseRate *= 1.0;
-      else if (occupation.includes('Medium')) baseRate *= 1.4;
-      else if (occupation.includes('High')) baseRate *= 2.0;
+      // Deductible adjustment
+      if (deductible === 500) annualPremium *= 1.15;
+      else if (deductible === 5000) annualPremium *= 0.85;
       
-      // Elimination period (longer wait = lower premium)
-      if (eliminationPeriod === 30) baseRate *= 1.3;
-      else if (eliminationPeriod === 60) baseRate *= 1.15;
-      else if (eliminationPeriod === 90) baseRate *= 1.0;
-      else if (eliminationPeriod === 180) baseRate *= 0.8;
-      
-      const monthlyPremium = monthlyBenefit * baseRate;
-      const annualPremium = monthlyPremium * 12;
-      const benefitVsPremium = ((monthlyBenefit / monthlyPremium) - 1).toFixed(1);
+      const monthlyPremium = annualPremium / 12;
       
       return {
-        monthlyPremium: monthlyPremium.toFixed(2),
         annualPremium: annualPremium.toFixed(2),
-        monthlyBenefit: monthlyBenefit.toFixed(2),
-        coveragePercent: coveragePercent,
-        eliminationPeriod: eliminationPeriod,
-        benefitVsPremium: benefitVsPremium
+        monthlyPremium: monthlyPremium.toFixed(2),
+        coveragePerDollar: (annualPremium / coverageAmount * 100).toFixed(3),
+        deductible: deductible
       };
     
             })();
@@ -231,19 +195,18 @@
         <p class="sub">$${result.annualPremium}/year</p>
       </div>
       <div class="result-details">
-        <div class="detail-row"><span>Monthly Benefit:</span><span>$${result.monthlyBenefit}</span></div>
-        <div class="detail-row"><span>Coverage Percentage:</span><span>${result.coveragePercent}%</span></div>
-        <div class="detail-row"><span>Elimination Period:</span><span>${result.eliminationPeriod} days</span></div>
-        <div class="detail-row"><span>Benefit vs Premium Ratio:</span><span>${result.benefitVsPremium}x</span></div>
+        <div class="detail-row"><span>Coverage Amount:</span><span>$${result.coverageAmount || coverageAmount}</span></div>
+        <div class="detail-row"><span>Deductible:</span><span>$${result.deductible}</span></div>
+        <div class="detail-row"><span>Cost per $100 Coverage:</span><span>$${result.coveragePerDollar}</span></div>
       </div>
       <div class="info-box">
-        <strong>💡 Key Facts About Disability Insurance:</strong>
+        <strong>💡 Ways to Lower Your Premium:</strong>
         <ul>
-          <li>Covers 50-70% of income if you're unable to work</li>
-          <li>Elimination period = waiting time before benefits start</li>
-          <li>Longer elimination = lower premium</li>
-          <li>25% of workers will be disabled for 90+ days before age 65</li>
-          <li>Employer group coverage often insufficient</li>
+          <li>Increase your deductible to $2,500 or $5,000</li>
+          <li>Bundle with auto insurance (save 15-25%)</li>
+          <li>Install security system or smoke detectors</li>
+          <li>Improve home's roof, plumbing, electrical</li>
+          <li>Shop multiple insurers annually</li>
         </ul>
       </div>
     `;

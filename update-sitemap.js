@@ -1,10 +1,9 @@
+#!/usr/bin/env node
 const fs = require('fs');
 const baseUrl = 'https://alexchalu.github.io/healthcalcs/';
 const today = new Date().toISOString().split('T')[0];
 
-const files = fs.readdirSync(__dirname)
-  .filter(f => f.endsWith('.html'))
-  .sort();
+const files = fs.readdirSync(__dirname).filter(f => f.endsWith('.html')).sort();
 
 let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
 sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
