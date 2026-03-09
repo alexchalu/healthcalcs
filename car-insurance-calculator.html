@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Insurance Cost Calculator - Estimate Your Auto Insurance Premium | HealthCalcs</title>
+    <meta name="description" content="Free car insurance calculator. Estimate your auto insurance premium based on age, vehicle, driving record, and coverage. Compare rates and save up to $600/year.">
+    <meta name="keywords" content="car insurance calculator, auto insurance estimate, insurance cost, car insurance rates, insurance premium calculator">
+    <link rel="canonical" href="https://alexchalu.github.io/healthcalcs/car-insurance-calculator.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; padding: 2rem 1rem; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 2rem; }
+        .header h1 { font-size: 2.2rem; margin-bottom: 0.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .header p { font-size: 1.1rem; opacity: 0.95; }
+        .calc-card { background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 2rem; }
+        .calc-card h2 { color: #667eea; margin-bottom: 1.5rem; font-size: 1.5rem; }
+        .form-section { margin-bottom: 2rem; }
+        .form-section h3 { color: #555; font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #f0f0f0; }
+        .input-group { margin-bottom: 1.25rem; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #555; }
+        .input-group input, .input-group select { width: 100%; padding: 0.75rem; border: 2px solid #e0e6ed; border-radius: 8px; font-size: 1rem; transition: border 0.3s; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: #667eea; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
+        .btn-calculate { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; transition: transform 0.2s; }
+        .btn-calculate:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        .result-box { background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%); border-left: 4px solid #667eea; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; display: none; }
+        .result-box.show { display: block; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .result-price { font-size: 2.5rem; font-weight: 800; color: #667eea; margin-bottom: 0.5rem; }
+        .result-annual { color: #666; font-size: 1rem; margin-bottom: 1rem; }
+        .result-factors { background: white; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+        .result-factors h4 { color: #667eea; margin-bottom: 0.75rem; }
+        .result-factors ul { margin-left: 1.5rem; }
+        .result-factors li { margin-bottom: 0.5rem; color: #555; }
+        .info-section { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 2rem; }
+        .info-section h3 { color: #667eea; margin-bottom: 1rem; }
+        .info-section p, .info-section ul { margin-bottom: 1rem; color: #555; }
+        .info-section ul { margin-left: 1.5rem; }
+        .ad-placeholder { background: white; border: 2px dashed #ccc; padding: 2rem; text-align: center; margin: 2rem 0; border-radius: 12px; min-height: 250px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .footer { text-align: center; color: white; padding: 2rem 0; }
+        .footer a { color: white; text-decoration: underline; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } .input-row { grid-template-columns: 1fr; } }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3112605892426625" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 Car Insurance Cost Calculator</h1>
+            <p>Estimate your auto insurance premium and learn how to save money</p>
+        </div>
+
+        <!-- Ad Slot 1 -->
+        <div class="ad-placeholder">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3112605892426625" data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <div class="calc-card">
+            <h2>Calculate Your Estimated Premium</h2>
+            
+            <form id="insurance-form">
+                <div class="form-section">
+                    <h3>Driver Information</h3>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="age">Your Age</label>
+                            <input type="number" id="age" min="16" max="100" value="30" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="marital">Marital Status</label>
+                            <select id="marital">
+                                <option value="single">Single</option>
+                                <option value="married">Married</option>
+                                <option value="divorced">Divorced</option>
+                                <option value="widowed">Widowed</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="credit">Credit Score</label>
+                            <select id="credit">
+                                <option value="excellent">Excellent (750+)</option>
+                                <option value="good" selected>Good (700-749)</option>
+                                <option value="fair">Fair (650-699)</option>
+                                <option value="poor">Poor (Below 650)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Vehicle Information</h3>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="vehicle-year">Vehicle Year</label>
+                            <input type="number" id="vehicle-year" min="1990" max="2026" value="2020" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicle-value">Vehicle Value ($)</label>
+                            <input type="number" id="vehicle-value" min="1000" max="200000" value="25000" step="1000" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="vehicle-type">Vehicle Type</label>
+                        <select id="vehicle-type">
+                            <option value="sedan">Sedan</option>
+                            <option value="suv">SUV</option>
+                            <option value="truck">Truck</option>
+                            <option value="coupe">Coupe/Sports Car</option>
+                            <option value="minivan">Minivan</option>
+                            <option value="luxury">Luxury</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Driving Record & Usage</h3>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="miles-per-year">Annual Miles</label>
+                            <input type="number" id="miles-per-year" min="1000" max="50000" value="12000" step="1000" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="years-licensed">Years Licensed</label>
+                            <input type="number" id="years-licensed" min="0" max="60" value="10" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Driving History (check all that apply)</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="accidents" value="accidents">
+                            <label for="accidents">At-fault accident in past 3 years</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="tickets" value="tickets">
+                            <label for="tickets">Speeding ticket in past 3 years</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="dui" value="dui">
+                            <label for="dui">DUI/DWI in past 5 years</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Coverage Level</h3>
+                    <div class="input-group">
+                        <label for="coverage">Desired Coverage</label>
+                        <select id="coverage">
+                            <option value="minimum">Minimum (State Required)</option>
+                            <option value="standard" selected>Standard (50/100/50)</option>
+                            <option value="recommended">Recommended (100/300/100)</option>
+                            <option value="premium">Premium (250/500/100)</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="deductible">Deductible ($)</label>
+                            <select id="deductible">
+                                <option value="250">$250</option>
+                                <option value="500" selected>$500</option>
+                                <option value="1000">$1,000</option>
+                                <option value="2000">$2,000</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-calculate">Calculate My Premium</button>
+
+                <div id="result" class="result-box"></div>
+            </form>
+        </div>
+
+        <!-- Ad Slot 2 -->
+        <div class="ad-placeholder">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3112605892426625" data-ad-slot="1234567891" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <div class="info-section">
+            <h3>How Car Insurance Premiums Are Calculated</h3>
+            <p>Insurance companies use dozens of factors to determine your rate. The major factors include:</p>
+            <ul>
+                <li><strong>Age & Experience:</strong> Drivers under 25 and over 75 typically pay more</li>
+                <li><strong>Driving Record:</strong> Accidents, tickets, and DUIs significantly increase rates</li>
+                <li><strong>Vehicle Type:</strong> Sports cars and luxury vehicles cost more to insure</li>
+                <li><strong>Credit Score:</strong> Better credit often means lower premiums (in most states)</li>
+                <li><strong>Location:</strong> Urban areas with higher accident/theft rates cost more</li>
+                <li><strong>Coverage Level:</strong> More coverage = higher premium, but better protection</li>
+                <li><strong>Annual Mileage:</strong> More miles driven = higher risk</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h3>How to Save Money on Car Insurance</h3>
+            <ul>
+                <li><strong>Shop Around:</strong> Compare quotes from 3-5 companies - rates vary by $500+ for the same coverage</li>
+                <li><strong>Bundle Policies:</strong> Combine auto + home/renters insurance for 10-25% discounts</li>
+                <li><strong>Increase Deductibles:</strong> Raising from $250 to $1,000 can save 15-30%</li>
+                <li><strong>Ask About Discounts:</strong> Good student, safe driver, low mileage, anti-theft, defensive driving course</li>
+                <li><strong>Maintain Good Credit:</strong> Improving credit score from fair to good can save $500+/year</li>
+                <li><strong>Review Coverage Annually:</strong> As your car ages, dropping collision/comprehensive may make sense</li>
+                <li><strong>Pay in Full:</strong> Avoid monthly installment fees ($20-50/year savings)</li>
+            </ul>
+        </div>
+
+        <!-- Ad Slot 3 -->
+        <div class="ad-placeholder">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3112605892426625" data-ad-slot="1234567892" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <div class="info-section">
+            <h3>More Health & Insurance Calculators</h3>
+            <p>Check out our other calculators:</p>
+            <ul>
+                <li><a href="index.html">HealthCalcs Home - All Calculators</a></li>
+                <li><a href="life-insurance-calculator.html">Life Insurance Calculator</a></li>
+                <li><a href="health-insurance-cost.html">Health Insurance Cost Estimator</a></li>
+                <li><a href="https://alexchalu.github.io/smartcalc/">SmartCalc - Financial Tools</a></li>
+                <li><a href="https://alexchalu.github.io/toolpulse/">ToolPulse - 500+ Free Tools</a></li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2026 HealthCalcs. Free health and insurance calculators.</p>
+            <p><a href="index.html">Home</a> | <a href="https://alexchalu.github.io/smartcalc/">SmartCalc</a> | <a href="https://alexchalu.github.io/toolpulse/">ToolPulse</a></p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Disclaimer: This calculator provides estimates only. Actual insurance rates vary by location, insurance company, and individual circumstances. Always get quotes from multiple insurers.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('insurance-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get all inputs
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const marital = document.getElementById('marital').value;
+            const credit = document.getElementById('credit').value;
+            const vehicleYear = parseInt(document.getElementById('vehicle-year').value);
+            const vehicleValue = parseInt(document.getElementById('vehicle-value').value);
+            const vehicleType = document.getElementById('vehicle-type').value;
+            const milesPerYear = parseInt(document.getElementById('miles-per-year').value);
+            const yearsLicensed = parseInt(document.getElementById('years-licensed').value);
+            const accidents = document.getElementById('accidents').checked;
+            const tickets = document.getElementById('tickets').checked;
+            const dui = document.getElementById('dui').checked;
+            const coverage = document.getElementById('coverage').value;
+            const deductible = parseInt(document.getElementById('deductible').value);
+            
+            // Base rate (national average)
+            let monthlyPremium = 150;
+            
+            // Age factor
+            if (age < 20) monthlyPremium *= 2.2;
+            else if (age < 25) monthlyPremium *= 1.6;
+            else if (age < 30) monthlyPremium *= 1.2;
+            else if (age < 65) monthlyPremium *= 1.0;
+            else if (age < 75) monthlyPremium *= 1.1;
+            else monthlyPremium *= 1.4;
+            
+            // Gender (slight difference)
+            if (gender === 'male' && age < 25) monthlyPremium *= 1.1;
+            
+            // Marital status
+            if (marital === 'married') monthlyPremium *= 0.92;
+            
+            // Credit score
+            const creditFactors = {
+                'excellent': 0.85,
+                'good': 1.0,
+                'fair': 1.25,
+                'poor': 1.6
+            };
+            monthlyPremium *= creditFactors[credit];
+            
+            // Vehicle type
+            const vehicleFactors = {
+                'sedan': 1.0,
+                'suv': 1.05,
+                'truck': 1.08,
+                'coupe': 1.35,
+                'minivan': 0.95,
+                'luxury': 1.5
+            };
+            monthlyPremium *= vehicleFactors[vehicleType];
+            
+            // Vehicle age and value
+            const vehicleAge = 2026 - vehicleYear;
+            if (vehicleValue > 50000) monthlyPremium *= 1.3;
+            else if (vehicleValue > 35000) monthlyPremium *= 1.15;
+            if (vehicleAge > 10) monthlyPremium *= 0.9;
+            
+            // Annual mileage
+            if (milesPerYear > 20000) monthlyPremium *= 1.25;
+            else if (milesPerYear > 15000) monthlyPremium *= 1.1;
+            else if (milesPerYear < 7000) monthlyPremium *= 0.9;
+            
+            // Years licensed
+            if (yearsLicensed < 3) monthlyPremium *= 1.3;
+            else if (yearsLicensed >= 10) monthlyPremium *= 0.95;
+            
+            // Driving record
+            if (dui) monthlyPremium *= 2.5;
+            if (accidents) monthlyPremium *= 1.4;
+            if (tickets) monthlyPremium *= 1.2;
+            
+            // Coverage level
+            const coverageFactors = {
+                'minimum': 0.7,
+                'standard': 1.0,
+                'recommended': 1.3,
+                'premium': 1.6
+            };
+            monthlyPremium *= coverageFactors[coverage];
+            
+            // Deductible
+            const deductibleFactors = {
+                250: 1.2,
+                500: 1.0,
+                1000: 0.85,
+                2000: 0.7
+            };
+            monthlyPremium *= deductibleFactors[deductible];
+            
+            // Round to nearest dollar
+            monthlyPremium = Math.round(monthlyPremium);
+            const annualPremium = monthlyPremium * 12;
+            
+            // Build factors list
+            let factors = [];
+            if (age < 25) factors.push('Young driver (higher risk)');
+            if (accidents || tickets || dui) factors.push('Driving incidents on record');
+            if (credit === 'poor' || credit === 'fair') factors.push('Credit score impact');
+            if (vehicleType === 'coupe' || vehicleType === 'luxury') factors.push('High-risk vehicle type');
+            if (milesPerYear > 15000) factors.push('High annual mileage');
+            if (marital === 'married') factors.push('Married discount applied');
+            if (yearsLicensed >= 10) factors.push('Experienced driver discount');
+            if (deductible >= 1000) factors.push('High deductible savings');
+            
+            // Display result
+            const resultDiv = document.getElementById('result');
+            let factorsHTML = '';
+            if (factors.length > 0) {
+                factorsHTML = '<div class="result-factors"><h4>Factors Affecting Your Rate:</h4><ul>';
+                factors.forEach(f => factorsHTML += '<li>' + f + '</li>');
+                factorsHTML += '</ul></div>';
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="result-price">$${monthlyPremium}/month</div>
+                <div class="result-annual">Estimated Annual Premium: $${annualPremium.toLocaleString()}</div>
+                <p style="color:#555; margin-bottom:1rem;">This is an estimate based on national averages. Actual rates vary by state, zip code, and insurance company.</p>
+                <p style="color:#667eea; font-weight:600;">💡 Tip: Compare quotes from 3-5 insurers to find the best rate. You could save $300-800/year!</p>
+                ${factorsHTML}
+            `;
+            resultDiv.classList.add('show');
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    </script>
+</body>
+</html>

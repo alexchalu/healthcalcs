@@ -1,44 +1,24 @@
 const fs = require('fs');
+const baseUrl = 'https://alexchalu.github.io/healthcalcs/';
+const today = new Date().toISOString().split('T')[0];
 
-const getAllHtmlFiles = (dir, baseDir = '') => {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  let files = [];
-  
-  for (const entry of entries) {
-    const fullPath = `${dir}/${entry.name}`;
-    const relativePath = baseDir ? `${baseDir}/${entry.name}` : entry.name;
-    
-    if (entry.isDirectory() && entry.name !== '.git' && entry.name !== 'node_modules') {
-      files = files.concat(getAllHtmlFiles(fullPath, relativePath));
-    } else if (entry.isFile() && entry.name.endsWith('.html')) {
-      files.push(relativePath);
-    }
-  }
-  
-  return files;
-};
+const files = fs.readdirSync(__dirname)
+  .filter(f => f.endsWith('.html'))
+  .sort();
 
-const htmlFiles = getAllHtmlFiles('.');
-const baseUrl = 'https://alexchalu.github.io/healthcalcs';
+let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n';
+sitemap += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-const urls = htmlFiles
-  .filter(file => !file.includes('google'))
-  .map(file => {
-    const path = file === 'index.html' ? '' : file.replace('index.html', '');
-    const url = `${baseUrl}/${path}`;
-    const priority = file === 'index.html' ? '1.0' : file.startsWith('state/') ? '0.8' : '0.9';
-    return `  <url>
-    <loc>${url}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <priority>${priority}</priority>
-  </url>`;
-  })
-  .join('\n');
+files.forEach(file => {
+  sitemap += `  <url>\n`;
+  sitemap += `    <loc>${baseUrl}${file}</loc>\n`;
+  sitemap += `    <lastmod>${today}</lastmod>\n`;
+  sitemap += `    <changefreq>weekly</changefreq>\n`;
+  sitemap += `    <priority>0.8</priority>\n`;
+  sitemap += `  </url>\n`;
+});
 
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls}
-</urlset>`;
+sitemap += '</urlset>';
 
 fs.writeFileSync('sitemap.xml', sitemap);
-console.log(`✅ Sitemap updated with ${htmlFiles.length} pages`);
+console.log(`✅ Updated sitemap with ${files.length} pages`);
